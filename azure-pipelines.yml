@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+trigger:
+ - none
+   
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    useGlobalJson: false
+  displayName: 'Use .NET SDK'
+
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec: 5.8
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/NIF.License.Creation.API.csproj'
+    feedsToUse: 'select'
+    vstsFeed: 'ea5a51d6-9afc-4c3c-abaf-b36e7453b033'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/NIF.License.Creation.API.csproj'
+    arguments: '--output publish_output --configuration Release --no-restore'
+    
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'publish_output'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
